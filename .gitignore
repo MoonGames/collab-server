@@ -1,6 +1,9 @@
+*~
+
+# java files
 *.class
 
-# Package Files #
-/*.jar
-*.war
-*.ear
+# build files
+/build
+/deploy
+

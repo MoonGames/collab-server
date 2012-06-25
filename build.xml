@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="CollabPanel" default="createJar" basedir="./">
+    <property name="srcdir" location="./src" />
+    <property name="libdir" location="./lib" />
+    <property name="bindir" location="./build" />
+    <property name="deploydir" location="./deploy" />
+    <property name="jarname" value="CollabServer.jar" />
+    <property name="mainclass" value="cz.mgn.collabserver.CollabServer" />
+ 
+    <path id="classpath">
+        <fileset dir="${libdir}" includes="*.jar"/>
+    </path>
+
+    <target name="init">
+        <delete dir="${bindir}" />
+        <mkdir dir="${bindir}"/>
+        <copy todir="build/resources">
+            <fileset dir="src/resources"/>
+        </copy>
+    </target>
+
+    <target name="compile" depends="init">
+        <javac srcdir="${srcdir}" destdir="${bindir}" includes="**/*" source="1.6" target="1.6">
+            <classpath refid="classpath" />
+        </javac>
+    </target>
+
+    <target name="jarInit" depends="compile">
+        <delete dir="${deploydir}" />
+        <mkdir dir="${deploydir}"/>
+    </target>
+ 
+    <target name="createJar" depends="jarInit">
+        <jar destfile="${deploydir}/${jarname}">
+            <fileset dir="${bindir}"/>
+            <!-- classpath refid="classpath" / -->
+            <manifest>
+                <attribute name="Main-Class" value="${mainclass}"/>
+                <attribute name="Class-Path" value="${libdir}"/>
+            </manifest>
+        </jar>
+    </target>
+</project>
