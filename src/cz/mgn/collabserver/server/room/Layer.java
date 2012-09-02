@@ -4,12 +4,13 @@
  */
 package cz.mgn.collabserver.server.room;
 
+import java.awt.AlphaComposite;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 /**
  *
- *     @author indy
+ * @author indy
  */
 public class Layer {
 
@@ -25,10 +26,10 @@ public class Layer {
 
     public Layer(int id, int width, int height, BufferedImage background) {
         this(id, width, height);
-        
+
         Graphics2D g = (Graphics2D) image.getGraphics();
-        for(int x = 0; x < image.getWidth(); x += background.getWidth()) {
-            for(int y = 0; y < image.getHeight(); y += background.getHeight()) {
+        for (int x = 0; x < image.getWidth(); x += background.getWidth()) {
+            for (int y = 0; y < image.getHeight(); y += background.getHeight()) {
                 g.drawImage(background, x, y, null);
             }
         }
@@ -66,35 +67,10 @@ public class Layer {
 
     public boolean removeChange(BufferedImage change, int x, int y) {
         synchronized (image) {
-            int x2 = x + change.getWidth();
-            if (x2 >= image.getWidth()) {
-                x2 = image.getWidth() - 1;
-            }
-            int y2 = y + change.getHeight();
-            if (y2 >= image.getHeight()) {
-                y2 = image.getHeight() - 1;
-            }
-            for (int xx = x; xx < x2; xx++) {
-                for (int yy = y; yy < y2; yy++) {
-                    int pixel = image.getRGB(xx, yy);
-                    int gray = change.getRGB(xx - x, yy - y);
-                    gray &= 0x000000ff;
-
-                    int opaqueness = pixel;
-                    opaqueness &= 0xff000000;
-                    opaqueness >>>= 24;
-
-                    float opaquenessFloat = (float) opaqueness / 255f;
-                    float grayFloat = (float) gray / 255f;
-
-                    opaquenessFloat *= grayFloat;
-                    opaqueness = (int) (opaquenessFloat * 255f);
-                    pixel &= 0x00ffffff;
-                    pixel += opaqueness << 24;
-
-                    image.setRGB(xx, yy, pixel);
-                }
-            }
+            Graphics2D g = (Graphics2D) image.getGraphics();
+            g.setComposite(AlphaComposite.DstOut);
+            g.drawImage(change, x, y, null);
+            g.dispose();
             return true;
         }
     }
