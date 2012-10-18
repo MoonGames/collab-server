@@ -15,6 +15,13 @@ import java.util.Date;
  */
 public class CollabServer {
 
+    public static final String HELP = "This is Collab server, see http://collab.mgn.cz/ for more info."
+            + "\n\n"
+            + "\t" + "-p" + "\t\t" + "listening port" + "\n"
+            + "\t" + "-w" + "\t\t" + "starts HTTP subserver" + "\n"
+            + "\t" + "-a" + "\t\t" + "server address (collab.example.com)" + "\n"
+            + "\t" + "-q" + "\t\t" + "HTTP subserver listening port" + "\n"
+            + "\t" + "-h --help" + "\t" + "shows help" + "\n";
     protected static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
     protected static HTTPServer httpServer = null;
 
@@ -35,14 +42,14 @@ public class CollabServer {
                     } catch (NumberFormatException ex) {
                     }
                 }
-            } else if ("-h".equals(args[i])) {
+            } else if ("-w".equals(args[i])) {
                 http = true;
             } else if ("-a".equals(args[i])) {
                 i++;
                 if (i < args.length) {
                     address = args[i];
                 }
-            } else if ("-ph".equals(args[i])) {
+            } else if ("-q".equals(args[i])) {
                 i++;
                 if (i < args.length) {
                     try {
@@ -50,6 +57,9 @@ public class CollabServer {
                     } catch (NumberFormatException ex) {
                     }
                 }
+            } else if ("-h".equals(args[i]) || "--help".equals(args[i])) {
+                System.out.println(HELP);
+                System.exit(0);
             }
         }
         if (http) {

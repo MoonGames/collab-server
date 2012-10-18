@@ -5,18 +5,20 @@
 package cz.mgn.collabserver.server.client;
 
 import cz.mgn.collabserver.CSUtils;
+import cz.mgn.collabserver.CollabServer;
 import cz.mgn.collabserver.server.Server;
 import cz.mgn.collabserver.server.room.Room;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  *
- *         @author indy
+ * @author indy
  */
 public class Client extends Thread {
 
@@ -52,10 +54,10 @@ public class Client extends Thread {
     }
 
     /**
-     *         read next standard message from client
+     * read next standard message from client
      *
-     *         @param in input stream
-     *         @return if reading was sucesfull
+     * @param in input stream
+     * @return if reading was sucesfull
      */
     protected boolean readNext(InputStream in) throws IOException {
         byte[] ms = new byte[1];
@@ -92,28 +94,32 @@ public class Client extends Thread {
     }
 
     /**
-     *         process incoming data
+     * process incoming data
      *
-     *         @param bytes data to process
+     * @param bytes data to process
      */
     protected void dataReaded(byte[] bytes) {
         server.messageReceived(this, bytes);
     }
 
     /**
-     *         create and send standard message to client
+     * create and send standard message to client
      *
-     *         @param bytes data of message
+     * @param bytes data of message
      */
     public void send(byte[] bytes) {
         synchronized (out) {
             try {
                 if (!socket.isClosed()) {
-                    out.write(msStart);
-                    byte[] len = CSUtils.intToByteArray(bytes.length);
-                    out.write(len);
-                    out.write(bytes);
-                    out.flush();
+                    try {
+                        out.write(msStart);
+                        byte[] len = CSUtils.intToByteArray(bytes.length);
+                        out.write(len);
+                        out.write(bytes);
+                        out.flush();
+                    } catch (SocketException ex) {
+                        CollabServer.log(server, ex.getMessage(), true);
+                    }
                 }
             } catch (IOException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
@@ -122,7 +128,7 @@ public class Client extends Thread {
     }
 
     /**
-     *         close client connection and inform server
+     * close client connection and inform server
      */
     public void close() {
         try {
@@ -136,7 +142,7 @@ public class Client extends Thread {
     }
 
     /**
-     *         set parent room of this client, or null if isnt
+     * set parent room of this client, or null if isnt
      */
     public void setParentRoom(Room room, int idInParentRoom) {
         this.parentRoom = room;
@@ -144,7 +150,7 @@ public class Client extends Thread {
     }
 
     /**
-     *         return parent room of this client (if isnt returns null)
+     * return parent room of this client (if isnt returns null)
      */
     public Room getParentRoom() {
         return parentRoom;
