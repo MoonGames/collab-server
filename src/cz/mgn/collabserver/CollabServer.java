@@ -35,13 +35,16 @@ import java.util.Date;
  */
 public class CollabServer {
 
-    public static final String HELP = "This is Collab server, see http://collab.mgn.cz/ for more info."
+    public static final String VERSION = "1.0 pre-alpha 3";
+    public static final String HELP = "\n"
+            + "This is Collab server version " + VERSION + ", see http://collab.mgn.cz/ for more info."
             + "\n\n"
             + "\t" + "-p" + "\t\t" + "listening port" + "\n"
             + "\t" + "-w" + "\t\t" + "starts HTTP subserver" + "\n"
             + "\t" + "-a" + "\t\t" + "server address (collab.example.com)" + "\n"
             + "\t" + "-q" + "\t\t" + "HTTP subserver listening port" + "\n"
-            + "\t" + "-h --help" + "\t" + "shows help" + "\n";
+            + "\t" + "-h --help" + "\t" + "shows help" + "\n"
+            + "\t" + "-v --version" + "\t" + "shows version" + "\n";
     protected static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
     protected static HTTPServer httpServer = null;
 
@@ -79,6 +82,9 @@ public class CollabServer {
                 }
             } else if ("-h".equals(args[i]) || "--help".equals(args[i])) {
                 System.out.println(HELP);
+                System.exit(0);
+            } else if ("-v".equals(args[i]) || "--version".equals(args[i])) {
+                System.out.println(VERSION);
                 System.exit(0);
             }
         }
