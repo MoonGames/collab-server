@@ -120,6 +120,7 @@ public class Client extends Thread {
      */
     protected void dataReaded(byte[] bytes) {
         server.messageReceived(this, bytes);
+        CollabServer.logLevelAll(server, "client " + this + " received " + (5 + bytes.length) + " bytes");
     }
 
     /**
@@ -137,8 +138,9 @@ public class Client extends Thread {
                         out.write(len);
                         out.write(bytes);
                         out.flush();
+                        CollabServer.logLevelAll(server, "client " + this + " sending " + (1 + len.length + bytes.length) + " bytes");
                     } catch (SocketException ex) {
-                        CollabServer.log(server, ex.getMessage(), true);
+                        CollabServer.logLevelError(server, ex.getMessage());
                     }
                 }
             } catch (IOException ex) {

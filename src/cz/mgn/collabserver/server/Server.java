@@ -63,17 +63,17 @@ public class Server extends Thread {
         try {
             checker.start();
             socket = new ServerSocket(port);
-            CollabServer.log(this, "listening started", false);
+            CollabServer.logLevelMedium(this, "listening started");
             while (running) {
                 Socket clientSocket = socket.accept();
                 Client client = new Client(this, clientSocket);
                 client.start();
                 clients.add(client);
-                CollabServer.log(this, "connection accepted " + client, false);
+                CollabServer.logLevelMedium(this, "connection accepted " + client);
                 logClientsCount();
             }
         } catch (IOException ex) {
-            CollabServer.log(this, "" + ex, true);
+            CollabServer.logLevelError(this, "" + ex);
         }
     }
 
@@ -96,19 +96,19 @@ public class Server extends Thread {
     public void cliendClosed(Client client) {
         processor.destroyClient(client);
         clients.remove(client);
-        CollabServer.log(this, "connection closed " + client, false);
+        CollabServer.logLevelMedium(this, "connection closed " + client);
         logClientsCount();
     }
 
     public void addRoom(Room room) {
         rooms.add(room);
-        CollabServer.log(this, "room created " + room, false);
+        CollabServer.logLevelMedium(this, "room created " + room);
         logRoomsCount();
     }
 
     public void removeRoom(Room room) {
         rooms.remove(room);
-        CollabServer.log(this, "room destroyed " + room, false);
+        CollabServer.logLevelMedium(this, "room destroyed " + room);
         logRoomsCount();
     }
 
@@ -143,20 +143,16 @@ public class Server extends Thread {
         return "[name: " + name + " port: " + port + "]";
     }
 
-    public void log(Client client, String message) {
-        CollabServer.log(this, "on client " + client + ": " + message, false);
-    }
-
     public void error(Client client, String message) {
-        CollabServer.log(this, "on client " + client + ": " + message, true);
+        CollabServer.logLevelError(this, "on client " + client + ": " + message);
     }
 
     protected void logClientsCount() {
-        CollabServer.log(this, "" + clients.size() + " clients are now connected", false);
+        CollabServer.logLevelMedium(this, "" + clients.size() + " clients are now connected");
     }
 
     protected void logRoomsCount() {
-        CollabServer.log(this, "" + rooms.size() + " rooms are now opened", false);
+        CollabServer.logLevelMedium(this, "" + rooms.size() + " rooms are now opened");
     }
 
     public void checkConnections() {

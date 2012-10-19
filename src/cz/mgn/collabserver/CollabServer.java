@@ -26,8 +26,14 @@ package cz.mgn.collabserver;
 
 import cz.mgn.collabserver.http.HTTPServer;
 import cz.mgn.collabserver.server.Server;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,7 +41,13 @@ import java.util.Date;
  */
 public class CollabServer {
 
+    public static final int LOG_LEVEL_ALL = 3;
+    public static final int LOG_LEVEL_MEDIUM = 1;
+    public static final int LOG_LEVEL_ERROR = 0;
     public static final String VERSION = "1.0 pre-alpha 3";
+    public static final String HELP_LOG_LEVLES = "\t\t" + LOG_LEVEL_ERROR + " - error level" + "\n"
+            + "\t\t" + LOG_LEVEL_MEDIUM + " - medium level (default)" + "\n"
+            + "\t\t" + LOG_LEVEL_ALL + " - log all level" + "\n";
     public static final String HELP = "\n"
             + "This is Collab server version " + VERSION + ", see http://collab.mgn.cz/ for more info."
             + "\n\n"
@@ -43,10 +55,15 @@ public class CollabServer {
             + "\t" + "-w" + "\t\t" + "starts HTTP subserver" + "\n"
             + "\t" + "-a" + "\t\t" + "server address (collab.example.com)" + "\n"
             + "\t" + "-q" + "\t\t" + "HTTP subserver listening port" + "\n"
+            + "\t" + "-l --log" + "\t" + "sets log level" + "\n"
+            + "\n" + HELP_LOG_LEVLES + "\n"
+            + "\t" + "-f" + "\t\t" + "log to file" + "\n"
             + "\t" + "-h --help" + "\t" + "shows help" + "\n"
             + "\t" + "-v --version" + "\t" + "shows version" + "\n";
     protected static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
     protected static HTTPServer httpServer = null;
+    protected static int logLevel = LOG_LEVEL_MEDIUM;
+    protected static PrintWriter logToFile = null;
 
     /**
      * @param args the command line arguments
@@ -86,6 +103,29 @@ public class CollabServer {
             } else if ("-v".equals(args[i]) || "--version".equals(args[i])) {
                 System.out.println(VERSION);
                 System.exit(0);
+            } else if ("-l".equals(args[i]) || "--log".equals(args[i])) {
+                i++;
+                if (i < args.length) {
+                    try {
+                        logLevel = Integer.parseInt(args[i]);
+                    } catch (NumberFormatException ex) {
+                    }
+                }
+            } else if ("-f".equals(args[i])) {
+                i++;
+                if (i < args.length) {
+                    try {
+                        String fileName = args[i];
+                        File file = new File(fileName);
+                        boolean can = file.exists() && file.isFile() && file.canWrite();
+                        can = can || (file.getParentFile() != null && file.getParentFile().exists() && file.getParentFile().canWrite() && file.createNewFile());
+                        if (can) {
+                            logToFile = new PrintWriter(new FileWriter(file, true));
+                        }
+                    } catch (IOException ex) {
+                        Logger.getLogger(CollabServer.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
             }
         }
         if (http) {
@@ -99,13 +139,34 @@ public class CollabServer {
         return httpServer;
     }
 
-    public static void log(Server server, String message, boolean error) {
-        String time = "(" + dateFormat.format(new Date()) + ")";
-        String text = "server: " + server + " message: " + message;
-        if (error) {
-            System.err.println("error " + time + ": " + text);
-        } else {
-            System.out.println("log " + time + ": " + text);
+    public static void logLevelAll(Server server, String message) {
+        log(server, message, LOG_LEVEL_ALL);
+    }
+
+    public static void logLevelMedium(Server server, String message) {
+        log(server, message, LOG_LEVEL_MEDIUM);
+    }
+
+    public static void logLevelError(Server server, String message) {
+        log(server, message, LOG_LEVEL_ERROR);
+    }
+
+    public static void log(Server server, String message, int level) {
+        if (level <= logLevel) {
+            String time = "(" + dateFormat.format(new Date()) + ")";
+            String text = "server: " + server + " message: " + message;
+            String string;
+            if (level <= LOG_LEVEL_ERROR) {
+                string = "error " + time + ": " + text;
+                System.err.println(string);
+            } else {
+                string = "log " + time + ": " + text;
+                System.out.println(string);
+            }
+            if (logToFile != null) {
+                logToFile.println(string);
+                logToFile.flush();
+            }
         }
     }
 }
