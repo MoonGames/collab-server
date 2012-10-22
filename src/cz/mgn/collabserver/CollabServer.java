@@ -36,6 +36,8 @@ import java.util.logging.Logger;
  */
 public class CollabServer {
 
+    public static final int DEFAULT_PORT = 30125;
+    public static final int DEFAULT_HTTP_PORT = 8080;
     public static final int LOG_LEVEL_ALL = 3;
     public static final int LOG_LEVEL_MEDIUM = 1;
     public static final int LOG_LEVEL_ERROR = 0;
@@ -65,7 +67,7 @@ public class CollabServer {
      */
     public static void main(String[] args) {
         int port = 30125;
-        int httpPort = 8080;
+        int httpPort = DEFAULT_HTTP_PORT;
         boolean http = false;
         String address = "";
         for (int i = 0; i < args.length; i++) {
@@ -130,10 +132,21 @@ public class CollabServer {
         }
     }
 
+    public static void setLogLevel(int logLevel) {
+        CollabServer.logLevel = logLevel;
+    }
+
     public static void startServerWithHTTP(int httpPort, String serverAddress, int port) {
         httpServer = new HTTPServer(httpPort, serverAddress);
         Server main = new Server("main thread", port);
         main.start();
+    }
+
+    /**
+     * starts server on default port
+     */
+    public static void startServer() {
+        startServer(DEFAULT_PORT);
     }
 
     public static void startServer(int port) {
