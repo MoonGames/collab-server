@@ -18,10 +18,6 @@
  * along with Collab desktop.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package cz.mgn.collabserver.http;
 
 import java.awt.image.BufferedImage;
