@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Collab desktop.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package cz.mgn.collabserver;
 
 import cz.mgn.collabserver.http.HTTPServer;
@@ -125,10 +124,25 @@ public class CollabServer {
             }
         }
         if (http) {
-            httpServer = new HTTPServer(httpPort, address);
+            startServerWithHTTP(httpPort, address, port);
+        } else {
+            startServer(port);
         }
+    }
+
+    public static void startServerWithHTTP(int httpPort, String serverAddress, int port) {
+        httpServer = new HTTPServer(httpPort, serverAddress);
         Server main = new Server("main thread", port);
         main.start();
+    }
+
+    public static void startServer(int port) {
+        Server main = new Server("main thread", port);
+        main.start();
+    }
+
+    public static void changeLogLevel(int logLevel) {
+        CollabServer.logLevel = logLevel;
     }
 
     public static HTTPServer getHTTPServer() {
