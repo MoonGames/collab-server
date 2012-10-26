@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Collab server.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package cz.mgn.collabserver.server;
 
 import cz.mgn.collabserver.CollabServer;
@@ -70,6 +69,14 @@ public class Server extends Thread {
             }
         } catch (IOException ex) {
             CollabServer.logLevelError(this, "" + ex);
+        } finally {
+            try {
+                if (socket != null) {
+                    socket.close();
+                }
+            } catch (IOException ex) {
+                CollabServer.logLevelError(this, "" + ex);
+            }
         }
     }
 

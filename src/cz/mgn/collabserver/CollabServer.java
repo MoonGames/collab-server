@@ -27,6 +27,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,6 +61,7 @@ public class CollabServer {
             + "\t" + "-v --version" + "\t" + "shows version" + "\n";
     protected static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd 'at' HH:mm:ss z");
     protected static HTTPServer httpServer = null;
+    protected static Map<Integer, Server> servers = new TreeMap<Integer, Server>();
     protected static int logLevel = LOG_LEVEL_MEDIUM;
     protected static PrintWriter logToFile = null;
 
@@ -137,9 +140,29 @@ public class CollabServer {
     }
 
     public static void startServerWithHTTP(int httpPort, String serverAddress, int port) {
-        httpServer = new HTTPServer(httpPort, serverAddress);
-        Server main = new Server("main thread", port);
-        main.start();
+        try {
+            startJustCollabServer(port);
+            httpServer = new HTTPServer(httpPort, serverAddress);
+        } catch (Exception ex) {
+            Logger.getLogger(CollabServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }
+
+    /**
+     * if some server listening on default port, stop him
+     */
+    public static void stopServerOnDefaultPort() {
+        stopServer(DEFAULT_PORT);
+    }
+
+    /**
+     * if some server listening on this port, stop him
+     */
+    public static void stopServer(int port) {
+        if (servers.containsKey(new Integer(port))) {
+            servers.remove(new Integer(port)).stopServer();
+        }
     }
 
     /**
@@ -150,7 +173,19 @@ public class CollabServer {
     }
 
     public static void startServer(int port) {
+        try {
+            startJustCollabServer(port);
+        } catch (Exception ex) {
+            Logger.getLogger(CollabServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    protected static void startJustCollabServer(int port) throws Exception {
+        if (servers.containsKey(new Integer(port))) {
+            throw new Exception("Server already running on this port!");
+        }
         Server main = new Server("main thread", port);
+        servers.put(new Integer(port), main);
         main.start();
     }
 

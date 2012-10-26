@@ -17,7 +17,6 @@
  * You should have received a copy of the GNU General Public License
  * along with Collab server.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package cz.mgn.collabserver.server.commandprocessor;
 
 import cz.mgn.collabserver.CSSettings;
@@ -72,7 +71,7 @@ public class CommandProcessor {
             client.setParentRoom(room, id);
             room.addClient(client);
             try {
-                Thread.sleep(10);
+                Thread.sleep(50);
             } catch (InterruptedException ex) {
                 Logger.getLogger(CommandProcessor.class.getName()).log(Level.SEVERE, null, ex);
             }
