@@ -27,6 +27,40 @@ package cz.mgn.collabserver;
 public class CSUtils {
 
     /**
+     * Generates human-readable string from byte array.
+     *
+     * Example 1 (without binary): [11, 73, 110, 100, 123]
+     *
+     * Example 2 (with binary): [11 (00001011), 73 (01001001), 110 (01101110),
+     * 100 (01100100), 121 (01111001)]
+     *
+     * @param b byte array to stringify
+     * @param binary if true binary representation will be attached (in brackets
+     * after each number)
+     *
+     * @return generated string
+     */
+    public static final String byteArrayToString(byte[] b, boolean binary) {
+        String zeros = "00000000";
+        StringBuilder string = new StringBuilder();
+        string.append("[");
+        for (int i = 0; i < b.length; i++) {
+            int value = b[i] >= 0 ? b[i] : 256 + b[i];
+            string.append("").append(value);
+            if (binary) {
+                String bv = Integer.toBinaryString(value);
+                bv = zeros.substring(bv.length()) + bv;
+                string.append(" (").append(bv).append(")");
+            }
+            if ((i + 1) < b.length) {
+                string.append(", ");
+            }
+        }
+        string.append("]");
+        return string.toString();
+    }
+
+    /**
      * transform integer to four bytes
      *
      * @param value integer to transform

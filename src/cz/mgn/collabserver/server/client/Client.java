@@ -115,8 +115,11 @@ public class Client extends Thread {
      * @param bytes data to process
      */
     protected void dataReaded(byte[] bytes) {
+        //TODO: (5 + bytes.length) use some symbolic constatn instead of 5
+        CollabServer.logLevelAll(server, "client " + this + " received " + (5
+                + bytes.length) + " bytes. Message bytes: " + CSUtils.
+                byteArrayToString(bytes, false));
         server.messageReceived(this, bytes);
-        CollabServer.logLevelAll(server, "client " + this + " received " + (5 + bytes.length) + " bytes");
     }
 
     /**
@@ -129,12 +132,15 @@ public class Client extends Thread {
             try {
                 if (!socket.isClosed()) {
                     try {
-                        out.write(msStart);
                         byte[] len = CSUtils.intToByteArray(bytes.length);
+                        CollabServer.logLevelAll(server, "client " + this
+                                + " sending " + (1 + len.length + bytes.length)
+                                + " bytes. Message bytes: " + CSUtils.
+                                byteArrayToString(bytes, false));
+                        out.write(msStart);
                         out.write(len);
                         out.write(bytes);
                         out.flush();
-                        CollabServer.logLevelAll(server, "client " + this + " sending " + (1 + len.length + bytes.length) + " bytes");
                     } catch (SocketException ex) {
                         CollabServer.logLevelError(server, ex.getMessage());
                     }
