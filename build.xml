@@ -14,8 +14,13 @@
     <target name="init">
         <delete dir="${bindir}" />
         <mkdir dir="${bindir}"/>
-        <copy todir="build/resources">
-            <fileset dir="src/resources"/>
+        <copy todir="${bindir}/resources">
+            <fileset dir="${srcdir}/resources"/>
+        </copy>
+        <copy todir="${bindir}">
+            <fileset dir="${srcdir}">
+                <include name="**/*.java"/>
+            </fileset>
         </copy>
     </target>
 
